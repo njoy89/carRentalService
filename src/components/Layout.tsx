@@ -19,6 +19,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import PersonIcon from '@material-ui/icons/Person';
 
 const drawerWidth = 250;
 
@@ -66,6 +67,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ classes, children, histo
         ];
     } else {
         links = [
+            { id: 'login', name: 'Login', link: '/login', Icon: PersonIcon },
             { id: 'cars', name: 'Cars', link: '/cars', Icon: CarIcon },
         ];
     }
@@ -88,8 +90,8 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ classes, children, histo
     const handleLogout = () => {
         ClientService.logout();
         handleMenuClose();
-        if (location.pathname !== '/') {
-            history.push('/');
+        if (location.pathname !== '/login') {
+            history.push('/login');
         }
     };
 
