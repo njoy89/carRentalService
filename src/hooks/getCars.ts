@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import CarService, { Car } from '../services/carService';
+import CarService from '../services/carService';
+import { Car } from '../types';
 
 export function getCars(): Car[] {
     const [cars, setCars] = useState<Car[]>([]);

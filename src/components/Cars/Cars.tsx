@@ -1,44 +1,140 @@
 import * as React from 'react';
 import { getCars } from '../../hooks/getCars';
+import { Car, CarStatus } from '../../types';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import Divider from '@material-ui/core/Divider';
+import green from '@material-ui/core/colors/green';
+import orange from '@material-ui/core/colors/orange';
+import red from '@material-ui/core/colors/red';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-import * as styles from './Cars.scss';
+const useCarCardStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        card: {
+            padding: theme.spacing(2),
+            color: theme.palette.text.secondary
+        },
+        media: {
+            height: 250,
+            backgroundSize: 'contain',
+            transform: 'scale(1.25)'
+        },
+        model: {
+            textAlign: 'center'
+        },
+        dividerUpper: {
+            margin: '30px 0'
+        },
+        dividerBelow: {
+            marginTop: 30
+        },
+        actionButton: {
+            marginLeft: 8
+        },
+        statusCopyAvailable: { color: green[500], fontWeight: 700 },
+        statusCopyUnavailable: { color: red[500], fontWeight: 700 },
+        statusCopyRented: { color: orange[500], fontWeight: 700 },
+    })
+);
 
-export const Cars: React.FunctionComponent<{}> = () => {
-    const cars = getCars();
+interface CarCardProps {
+    car: Car;
+}
+
+const CarCard: React.FunctionComponent<CarCardProps> = ({ car }) => {
+    const classes = useCarCardStyles();
+
+    const renderTrait = (
+        name: string,
+        value: Car['carBodyType'] | Car['releaseYear'] | Car['amount']
+    ) => (
+        <Grid item xs={4}>
+            <Typography variant="h6" component="h6" color="textPrimary">{ name }</Typography>
+            <Typography component="p" color="textSecondary">{ value }</Typography>
+        </Grid>
+    );
+
+    const getStatusClassname = (): string => {
+        switch (car.carStatus) {
+            case CarStatus.AVAILABLE:
+                return classes.statusCopyAvailable;
+            case CarStatus.UNAVAILABLE:
+                return classes.statusCopyUnavailable;
+            case CarStatus.RENTED:
+                return classes.statusCopyRented;
+            default:
+                return '';
+        }
+    };
+
+    const renderStatus = () => {
+        const className = getStatusClassname();
+        return (
+            <Grid item xs={4}>
+                <Typography variant="h6" component="h6" color="textPrimary">Status</Typography>
+                <Typography component="p" className={className}>{ car.carStatus }</Typography>
+            </Grid>
+        );
+    };
+
+    const getActionButton = () => {
+        return (
+            <Button
+                size="small"
+                color="primary"
+                variant="outlined"
+                className={classes.actionButton}
+                disabled={car.carStatus === CarStatus.UNAVAILABLE}
+            >Rent</Button>
+        );
+    };
 
     return (
-        <Paper className={styles.container}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Model</TableCell>
-                        <TableCell>Body Type</TableCell>
-                        <TableCell align="right">Release Year</TableCell>
-                        <TableCell>Car Status</TableCell>
-                        <TableCell align="right">Price per day</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {cars.map(car => (
-                        <TableRow key={car.id} hover>
-                            <TableCell component="th" scope="row">
-                                {car.model}
-                            </TableCell>
-                            <TableCell>{car.carBodyType}</TableCell>
-                            <TableCell align="right">{car.releaseYear}</TableCell>
-                            <TableCell>{car.carStatus}</TableCell>
-                            <TableCell align="right">{car.amount} PLN</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </Paper>
-    )
+        <Grid item md={12} lg={6}>
+            <Card className={classes.card}>
+                <CardMedia
+                    className={classes.media}
+                    image={car.url}
+                    title={car.model}
+                />
+                <CardContent>
+                    <Typography gutterBottom variant="h4" component="h4" className={classes.model} color="textPrimary">
+                        { car.model }
+                    </Typography>
+
+                    <Divider className={classes.dividerUpper} />
+
+                    <Grid container spacing={3}>
+                        { renderTrait('Release Year', car.releaseYear) }
+                        { renderTrait('Car Body Type', car.carBodyType) }
+                        { renderTrait('Amount', `${car.amount} PLN / day`) }
+                        { renderStatus() }
+                    </Grid>
+
+                    <Divider className={classes.dividerBelow} />
+                </CardContent>
+                <CardActions >
+                    { getActionButton() }
+                </CardActions>
+            </Card>
+        </Grid>
+    );
 };
+
+export const Cars: React.FunctionComponent<{}> = () => (
+    <Grid container spacing={3}>{
+        getCars().map((car) => (
+            <CarCard
+                key={car.id}
+                car={car}
+            />
+        ))
+    }</Grid>
+);
