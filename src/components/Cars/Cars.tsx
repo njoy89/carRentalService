@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { getCars } from '../../hooks/getCars';
 import { Car, CarStatus } from '../../types';
 import { RentalCarModal } from './RentalCarModal';
+import CarService from '../../services/carService';
+import { Notification } from '../Notification';
 
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -95,7 +97,7 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({
     };
 
     const getActionButton = () => {
-        // TODO
+        // TODO: determine which button is supposed to be shown
 
         return (
             <Button
@@ -145,6 +147,8 @@ export const Cars: React.FunctionComponent<{}> = () => {
     const [modalCar, setModalCar] = useState<Car | null>(null);
     const [rentalModalIsShown, setRentalModalIsShown] = useState(false);
     const [returnModalIsShow, setReturnModalIsShow] = useState(false);
+    const [rentedSuccessMessageIsSnown, showRentedSuccessMessage] = useState(false);
+    const [errorRentalMessage, setErrorRentalMessage] = useState('');
 
     const rentCar = (car: Car) => {
         setModalCar(car);
@@ -163,7 +167,23 @@ export const Cars: React.FunctionComponent<{}> = () => {
         setReturnModalIsShow(false);
     };
     const handleRental = (startDate: Date, endDate: Date) => {
-        // TODO
+        if (modalCar === null) {
+            return;
+        }
+
+        const carId = modalCar.id;
+
+        CarService.rentCar(carId, startDate, endDate)
+            .then((response) => {
+                if (response !== 'OK') {
+                    setErrorRentalMessage('You cannot rent this car');
+                } else {
+                    showRentedSuccessMessage(true);
+                    getCarsData.loadCars();
+                }
+
+                handleRentalModalClose();
+            });
     };
 
     const getCarsData = getCars();
@@ -194,6 +214,18 @@ export const Cars: React.FunctionComponent<{}> = () => {
                     car={modalCar}
                 />
             ) }
+            <Notification
+                open={rentedSuccessMessageIsSnown}
+                message="You rented a car!"
+                handleClose={() => showRentedSuccessMessage(false)}
+                variant="success"
+            />
+            <Notification
+                open={!!errorRentalMessage}
+                message={errorRentalMessage}
+                handleClose={() => setErrorRentalMessage('')}
+                variant="error"
+            />
         </>
     );
 };

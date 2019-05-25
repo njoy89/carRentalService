@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import CarService from '../services/carService';
-import { Car, GetCarsData } from '../types';
+import { Car, CarsData } from '../types';
+
+export interface GetCarsData extends CarsData {
+    loadCars: () => void;
+}
 
 export function getCars(): GetCarsData {
-    const [data, setData] = useState<GetCarsData>({
+    const [data, setData] = useState<CarsData>({
         cars: [],
         isFetching: false,
         error: ''
     });
 
-    useEffect(() => {
+    const loadCars = () => {
         setData({
             cars: [],
             isFetching: true,
@@ -31,7 +35,14 @@ export function getCars(): GetCarsData {
                     error: 'Error while fetching error'
                 });
             });
+    };
+
+    useEffect(() => {
+        loadCars();
     }, []);
 
-    return data;
+    return {
+        ...data,
+        loadCars
+    };
 }

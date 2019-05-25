@@ -42,7 +42,7 @@ export const RentalCarModal: React.FunctionComponent<RentalCarModalProps> = ({
             <DialogTitle id="form-dialog-title">Rent a car</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    <div>You are about to rent <strong>{ car.model }</strong>. Select the dates of your rental.</div>
+                    You are about to rent <strong>{ car.model }</strong>. Select the dates of your rental.
                 </DialogContentText>
                 <MuiPickersUtilsProvider utils={DateFnsUtils} locale={en}>
                     <Grid container spacing={3}>
