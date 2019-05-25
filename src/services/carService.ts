@@ -1,12 +1,12 @@
 import { Car } from '../types';
 import ClientService from '../services/clientService';
+import { HOST } from '../constants';
 
 const loadCars = (): Promise<Car[]> => new Promise((resolve) => {
     // simulation of some slight delay
     setTimeout(() => {
         resolve(
-            // TODO
-            fetch('http://192.168.0.178:8080/api/allCars')
+            fetch(`${HOST}/api/allCars`)
                 .then(response => response.json())
         );
     }, 500);
@@ -15,8 +15,7 @@ const loadCars = (): Promise<Car[]> => new Promise((resolve) => {
 const rentCar = (carId: string, startDate: Date, endDate: Date): Promise<string> => {
     const clientId = ClientService.getId();
 
-    // TODO
-    return fetch('http://192.168.0.178:8080/api/rentCar', {
+    return fetch(`${HOST}/api/rentCar`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -32,7 +31,13 @@ const rentCar = (carId: string, startDate: Date, endDate: Date): Promise<string>
         .then(response => response.json());
 };
 
+const returnCar = (carId: string, comment: string): Promise<string> => {
+    // TODO
+    return Promise.resolve('OK');
+};
+
 export default {
     loadCars,
-    rentCar
+    rentCar,
+    returnCar
 }

@@ -178,8 +178,8 @@ export const Cars: React.FunctionComponent<{}> = () => {
     const [modalCar, setModalCar] = useState<Car | null>(null);
     const [rentalModalIsShown, setRentalModalIsShown] = useState(false);
     const [returnModalIsShow, setReturnModalIsShow] = useState(false);
-    const [rentedSuccessMessageIsSnown, showRentedSuccessMessage] = useState(false);
-    const [errorRentalMessage, setErrorRentalMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const rentCar = (car: Car) => {
         setModalCar(car);
@@ -207,9 +207,9 @@ export const Cars: React.FunctionComponent<{}> = () => {
         CarService.rentCar(carId, startDate, endDate)
             .then((response) => {
                 if (response !== 'OK') {
-                    setErrorRentalMessage('You cannot rent this car');
+                    setErrorMessage('You cannot rent this car');
                 } else {
-                    showRentedSuccessMessage(true);
+                    setSuccessMessage('You rented a car!');
                     getCarsData.loadCars();
                 }
 
@@ -217,10 +217,23 @@ export const Cars: React.FunctionComponent<{}> = () => {
             });
     };
     const handleReturn = (comment: string) => {
-        // TODO
-        console.log(comment);
+        if (modalCar === null) {
+            return;
+        }
 
-        handleReturnModalClose();
+        const carId = modalCar.id;
+
+        CarService.returnCar(carId, comment)
+            .then((response) => {
+                if (response !== 'OK') {
+                    setErrorMessage('You cannot return this car');
+                } else {
+                    setSuccessMessage('You returned a car!');
+                    getCarsData.loadCars();
+                }
+
+                handleReturnModalClose();
+            });
     };
 
     const getCarsData = getCars();
@@ -260,15 +273,15 @@ export const Cars: React.FunctionComponent<{}> = () => {
                 />
             ) }
             <Notification
-                open={rentedSuccessMessageIsSnown}
-                message="You rented a car!"
-                handleClose={() => showRentedSuccessMessage(false)}
+                open={!!successMessage}
+                message={successMessage}
+                handleClose={() => setSuccessMessage('')}
                 variant="success"
             />
             <Notification
-                open={!!errorRentalMessage}
-                message={errorRentalMessage}
-                handleClose={() => setErrorRentalMessage('')}
+                open={!!errorMessage}
+                message={errorMessage}
+                handleClose={() => setErrorMessage('')}
                 variant="error"
             />
         </>

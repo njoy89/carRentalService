@@ -1,4 +1,5 @@
 import { Client } from '../types';
+import { HOST } from '../constants';
 
 const CLIENT_ID_KEY = 'clientId';
 
@@ -21,8 +22,7 @@ const getClient = (clientId: string): Promise<Client | string> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve(
-                // TODO
-                fetch(`http://192.168.0.178:8080/api/getClient?clientId=${encodeURIComponent(clientId)}`)
+                fetch(`${HOST}/api/getClient?clientId=${encodeURIComponent(clientId)}`)
                     .then(response => response.json())
             );
         }, 500);
