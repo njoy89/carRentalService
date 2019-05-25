@@ -1,6 +1,8 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { getCars } from '../../hooks/getCars';
 import { Car, CarStatus } from '../../types';
+import { RentalCarModal } from './RentalCarModal';
 
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -13,9 +15,10 @@ import Divider from '@material-ui/core/Divider';
 import green from '@material-ui/core/colors/green';
 import orange from '@material-ui/core/colors/orange';
 import red from '@material-ui/core/colors/red';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-const useCarCardStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         card: {
             padding: theme.spacing(2),
@@ -41,15 +44,22 @@ const useCarCardStyles = makeStyles((theme: Theme) =>
         statusCopyAvailable: { color: green[500], fontWeight: 700 },
         statusCopyUnavailable: { color: red[500], fontWeight: 700 },
         statusCopyRented: { color: orange[500], fontWeight: 700 },
+        spinnerWrapper: { display: 'flex', justifyContent: 'center' }
     })
 );
 
 interface CarCardProps {
     car: Car;
+    rentCar: (car: Car) => void;
+    returnCar: (car: Car) => void;
 }
 
-const CarCard: React.FunctionComponent<CarCardProps> = ({ car }) => {
-    const classes = useCarCardStyles();
+const CarCard: React.FunctionComponent<CarCardProps> = ({
+    car,
+    rentCar,
+    returnCar
+}) => {
+    const classes = useStyles();
 
     const renderTrait = (
         name: string,
@@ -85,13 +95,16 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({ car }) => {
     };
 
     const getActionButton = () => {
+        // TODO
+
         return (
             <Button
                 size="small"
                 color="primary"
                 variant="outlined"
                 className={classes.actionButton}
-                disabled={car.carStatus === CarStatus.UNAVAILABLE}
+                disabled={[CarStatus.UNAVAILABLE, CarStatus.RENTED].includes(car.carStatus)}
+                onClick={() => rentCar(car)}
             >Rent</Button>
         );
     };
@@ -128,13 +141,59 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({ car }) => {
     );
 };
 
-export const Cars: React.FunctionComponent<{}> = () => (
-    <Grid container spacing={3}>{
-        getCars().map((car) => (
-            <CarCard
-                key={car.id}
-                car={car}
-            />
-        ))
-    }</Grid>
-);
+export const Cars: React.FunctionComponent<{}> = () => {
+    const [modalCar, setModalCar] = useState<Car | null>(null);
+    const [rentalModalIsShown, setRentalModalIsShown] = useState(false);
+    const [returnModalIsShow, setReturnModalIsShow] = useState(false);
+
+    const rentCar = (car: Car) => {
+        setModalCar(car);
+        setRentalModalIsShown(true);
+    };
+    const returnCar = (car: Car) => {
+        setModalCar(car);
+        setReturnModalIsShow(true);
+    };
+    const handleRentalModalClose = () => {
+        setModalCar(null);
+        setRentalModalIsShown(false);
+    };
+    const handleReturnModalClose = () => {
+        setModalCar(null);
+        setReturnModalIsShow(false);
+    };
+    const handleRental = (startDate: Date, endDate: Date) => {
+        // TODO
+    };
+
+    const getCarsData = getCars();
+    const classes = useStyles();
+
+    return (
+        <>
+            { getCarsData.isFetching && (
+                <div className={classes.spinnerWrapper}>
+                    <CircularProgress size={60} />
+                </div>
+            ) }
+            <Grid container spacing={3}>{
+                getCarsData.cars.map((car) => (
+                    <CarCard
+                        key={car.id}
+                        car={car}
+                        rentCar={rentCar}
+                        returnCar={returnCar}
+                    />
+                ))
+            }</Grid>
+            { modalCar && (
+                <RentalCarModal
+                    show={rentalModalIsShown}
+                    handleClose={handleRentalModalClose}
+                    handleOk={handleRental}
+                    car={modalCar}
+                />
+            ) }
+        </>
+    );
+};

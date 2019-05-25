@@ -13,3 +13,9 @@ export interface Car {
     amount: number;
     url: string;
 }
+
+export interface GetCarsData {
+    cars: Car[];
+    isFetching: boolean;
+    error: string;
+}

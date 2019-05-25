@@ -1,16 +1,37 @@
 import { useState, useEffect } from 'react';
 import CarService from '../services/carService';
-import { Car } from '../types';
+import { Car, GetCarsData } from '../types';
 
-export function getCars(): Car[] {
-    const [cars, setCars] = useState<Car[]>([]);
+export function getCars(): GetCarsData {
+    const [data, setData] = useState<GetCarsData>({
+        cars: [],
+        isFetching: false,
+        error: ''
+    });
 
     useEffect(() => {
+        setData({
+            cars: [],
+            isFetching: true,
+            error: ''
+        });
+
         CarService.loadCars()
             .then((cars: Car[]) => {
-                setCars(cars);
+                setData({
+                    cars,
+                    isFetching: false,
+                    error: ''
+                });
+            })
+            .catch(() => {
+                setData({
+                    cars: [],
+                    isFetching: false,
+                    error: 'Error while fetching error'
+                });
             });
     }, []);
 
-    return cars;
+    return data;
 }
