@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { getCars } from '../../hooks/getCars';
 import { Car, CarStatus } from '../../types';
 import { RentalCarModal } from './RentalCarModal';
+import { ReturnCarModal } from './ReturnCarModal';
 import CarService from '../../services/carService';
 import { Notification } from '../Notification';
 
@@ -99,16 +100,40 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({
     const getActionButton = () => {
         // TODO: determine which button is supposed to be shown
 
-        return (
-            <Button
-                size="small"
-                color="primary"
-                variant="outlined"
-                className={classes.actionButton}
-                disabled={[CarStatus.UNAVAILABLE, CarStatus.RENTED].includes(car.carStatus)}
-                onClick={() => rentCar(car)}
-            >Rent</Button>
-        );
+        switch (car.carStatus) {
+            case CarStatus.AVAILABLE:
+                return (
+                    <Button
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        className={classes.actionButton}
+                        onClick={() => rentCar(car)}
+                    >Rent</Button>
+                );
+            case CarStatus.RENTED:
+                return (
+                    <Button
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        className={classes.actionButton}
+                        onClick={() => returnCar(car)}
+                    >Return</Button>
+                );
+            case CarStatus.UNAVAILABLE:
+                return (
+                    <Button
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        className={classes.actionButton}
+                        disabled
+                    >Rent</Button>
+                );
+            default:
+                return null;
+        }
     };
 
     return (
@@ -185,6 +210,12 @@ export const Cars: React.FunctionComponent<{}> = () => {
                 handleRentalModalClose();
             });
     };
+    const handleReturn = (comment: string) => {
+        // TODO
+        console.log(comment);
+
+        handleReturnModalClose();
+    };
 
     const getCarsData = getCars();
     const classes = useStyles();
@@ -211,6 +242,14 @@ export const Cars: React.FunctionComponent<{}> = () => {
                     show={rentalModalIsShown}
                     handleClose={handleRentalModalClose}
                     handleOk={handleRental}
+                    car={modalCar}
+                />
+            ) }
+            { modalCar && (
+                <ReturnCarModal
+                    show={returnModalIsShow}
+                    handleClose={handleReturnModalClose}
+                    handleOk={handleReturn}
                     car={modalCar}
                 />
             ) }
