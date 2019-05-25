@@ -18,21 +18,32 @@ const logout = () => {
     window.localStorage.removeItem(CLIENT_ID_KEY);
 };
 
-const getClient = (clientId: string): Promise<Client | string> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(
-                fetch(`${HOST}/api/getClient?clientId=${encodeURIComponent(clientId)}`)
-                    .then(response => response.json())
-            );
-        }, 500);
-    });
+const validateSession = (): Promise<void> => {
+    const clientId = getId();
+
+    if (clientId === null) {
+        return Promise.resolve();
+    } else {
+        return getClient(clientId)
+            .then((response) => typeof response !== 'string')
+            .catch(() => false)
+            .then((validated: boolean) => {
+                if (!validated) {
+                    logout();
+                }
+            });
+    }
 };
+
+const getClient = (clientId: string): Promise<Client | string> =>
+    fetch(`${HOST}/api/getClient?clientId=${encodeURIComponent(clientId)}`)
+        .then(response => response.json());
 
 export default {
     getId,
     isAuthenticated,
     setId,
     logout,
-    getClient
+    getClient,
+    validateSession
 };

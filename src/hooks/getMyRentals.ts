@@ -28,19 +28,20 @@ export function getMyRentals(): GetMyRentalsData {
         });
 
         CarService.getMyRentals(clientId)
-            .then((myRentals: MyRental[]) => {
-                setData({
-                    data: myRentals,
-                    isFetching: false,
-                    error: ''
-                });
-            })
-            .catch(() => {
-                setData({
-                    data: [],
-                    isFetching: false,
-                    error: 'Error while fetching error'
-                });
+            .then((response: MyRental[] | string) => {
+                if (typeof response === 'string') {
+                    setData({
+                        data: [],
+                        isFetching: false,
+                        error: 'Error while fetching error'
+                    });
+                } else {
+                    setData({
+                        data: response,
+                        isFetching: false,
+                        error: ''
+                    });
+                }
             });
     };
 

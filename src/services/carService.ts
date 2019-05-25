@@ -1,4 +1,4 @@
-import { Car, MyRental } from '../types';
+import {Car, MyRental, RentalStatus} from '../types';
 import ClientService from '../services/clientService';
 import { HOST } from '../constants';
 
@@ -61,14 +61,14 @@ const returnCar = (carRentalId: string, comments: string): Promise<string> => {
 
 const isCarRentedByCurrentUser = (myRentals: MyRental[], carId: string): boolean =>
     myRentals
-        .filter(item => item.returnDate === null) // not yet returned
+        .filter(item => item.status === RentalStatus.RENTED) // not yet returned
         .filter(item => item.carId === carId)
         .length > 0;
 
-// get a rental object related to a given carId and that has not beed returned yet
+// get a rental object related to a given carId and that has not been returned yet
 const getMyRentalByCarId = (myRentals: MyRental[], carId: string): MyRental | undefined =>
     myRentals
-        .filter(item => item.returnDate === null) // not yet returned
+        .filter(item => item.status === RentalStatus.RENTED) // not yet returned
         .find(item => item.carId === carId);
 
 export default {

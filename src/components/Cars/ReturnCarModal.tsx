@@ -25,7 +25,7 @@ export const ReturnCarModal: React.FunctionComponent<RentalCarModalProps> = ({
 }) => {
     const [comments, setComments] = useState('');
 
-    const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCommentsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setComments(e.currentTarget.value);
     };
 
@@ -37,12 +37,12 @@ export const ReturnCarModal: React.FunctionComponent<RentalCarModalProps> = ({
                     You are about to return <strong>{ car.model }</strong>. We'd really appreciate your feedback!
                 </DialogContentText>
                 <TextField
-                    label="Comment"
+                    label="Comments"
                     multiline
                     rows="4"
                     margin="normal"
                     variant="outlined"
-                    onChange={handleCommentChange}
+                    onChange={handleCommentsChange}
                     fullWidth
                 />
             </DialogContent>
