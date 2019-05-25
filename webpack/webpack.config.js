@@ -1,7 +1,9 @@
-module.exports = {
+module.exports = (env, argv) => ({
   entry: './src/index.tsx',
   output: {
-    filename: 'bundle.js',
+    filename: argv.mode === 'production'
+      ? '[name].[contenthash].js'
+      : 'bundle.js',
     path: __dirname + '/../dist',
     publicPath: '/'
   },
@@ -27,4 +29,4 @@ module.exports = {
       { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader' }
     ]
   }
-};
+});
