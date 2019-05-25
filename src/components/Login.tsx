@@ -8,12 +8,28 @@ import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import ClientService from '../../services/clientService';
+import { Notification } from './Notification';
+import ClientService from '../services/clientService';
 
-import * as styles from './Login.scss';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(() =>
+    createStyles({
+        container: {
+            margin: '40px auto',
+            width: 600
+        },
+        form: {
+            padding: 20
+        }
+    })
+);
 
 const LoginComponent: React.FunctionComponent<RouteComponentProps> = ({ history }) => {
+    const classes = useStyles();
+
     const [clientId, setClientId] = useState('');
+    const [loginError, setLoginError] = useState('');
 
     useEffect(() => {
         if (ClientService.isAuthenticated()) {
@@ -29,15 +45,22 @@ const LoginComponent: React.FunctionComponent<RouteComponentProps> = ({ history 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        ClientService.setId(clientId);
-
-        history.push('/cars');
+        ClientService
+            .getClient(clientId)
+            .then((response) => {
+                if (typeof response === 'string') {
+                    setLoginError(response);
+                } else {
+                    ClientService.setId(clientId);
+                    history.push('/cars');
+                }
+            });
     };
 
     return (
         <div>
-            <Paper className={styles.container}>
-                <form className={styles.form} onSubmit={handleSubmit}>
+            <Paper className={classes.container}>
+                <form className={classes.form} onSubmit={handleSubmit}>
                     <FormControl margin="normal" required fullWidth>
                         <InputLabel htmlFor="clientId">Client ID</InputLabel>
                         <Input id="clientId" name="clientId" autoFocus onChange={handleChange} value={clientId} />
@@ -51,8 +74,13 @@ const LoginComponent: React.FunctionComponent<RouteComponentProps> = ({ history 
                         Log in
                     </Button>
                 </form>
-
             </Paper>
+            <Notification
+                open={!!loginError}
+                message={loginError}
+                handleClose={() => setLoginError('')}
+                variant="error"
+            />
         </div>
     );
 };

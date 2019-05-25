@@ -19,3 +19,11 @@ export interface CarsData {
     isFetching: boolean;
     error: string;
 }
+
+export interface Client {
+    id: string;
+    name: string;
+    surname: string;
+    email: string;
+    address: string;
+}

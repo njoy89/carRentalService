@@ -2,7 +2,7 @@ import * as React from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 
 import { Cars } from './Cars/Cars';
-import { Login } from './Login/Login';
+import { Login } from './Login';
 import { MyRentals } from './MyRentals/MyRentals';
 import { Profile } from './Profile/Profile';
 import { PrivateRoute } from './PrivateRoute';
