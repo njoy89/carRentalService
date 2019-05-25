@@ -6,6 +6,7 @@ import { RentalCarModal } from './RentalCarModal';
 import { ReturnCarModal } from './ReturnCarModal';
 import CarService from '../../services/carService';
 import { Notification } from '../Notification';
+import ClientService from '../../services/clientService';
 
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -63,6 +64,7 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({
     returnCar
 }) => {
     const classes = useStyles();
+    const clientIsAuthenticated = ClientService.isAuthenticated();
 
     const renderTrait = (
         name: string,
@@ -158,11 +160,15 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({
                         { renderStatus() }
                     </Grid>
 
-                    <Divider className={classes.dividerBelow} />
+                    { clientIsAuthenticated && (
+                        <Divider className={classes.dividerBelow} />
+                    ) }
                 </CardContent>
-                <CardActions >
-                    { getActionButton() }
-                </CardActions>
+                { clientIsAuthenticated && (
+                    <CardActions >
+                        { getActionButton() }
+                    </CardActions>
+                ) }
             </Card>
         </Grid>
     );
