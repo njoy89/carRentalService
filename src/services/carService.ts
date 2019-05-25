@@ -31,19 +31,17 @@ const rentCar = (carId: string, startDate: Date, endDate: Date): Promise<string>
         .then(response => response.json());
 };
 
-// TODO
-const getMyRentals = (): Promise<MyRental[]> => new Promise((resolve) => {
+const getMyRentals = (clientId: string): Promise<MyRental[]> => new Promise((resolve) => {
+    // simulation of some slight delay
     setTimeout(() => {
         resolve(
-            // TODO
-            [
-                { id: 'bubu', carId: 'fb0df273-681f-4362-86b2-fab18a248c01', startDate: '', endDate: '', rentDate: '', returnDate: null, amount: 100.0, comment: '' }
-            ]
+            fetch(`${HOST}/api/getClientRentals?clientId=${encodeURIComponent(clientId)}`)
+                .then(response => response.json())
         )
     }, 500);
 });
 
-const returnCar = (carRentalId: string, comment: string): Promise<string> => {
+const returnCar = (carRentalId: string, comments: string): Promise<string> => {
     const clientId = ClientService.getId();
 
     return fetch(`${HOST}/api/returnCar`, {
@@ -55,7 +53,7 @@ const returnCar = (carRentalId: string, comment: string): Promise<string> => {
         body: JSON.stringify({
             clientId,
             carRentalId,
-            comment
+            comments
         })
     })
         .then(response => response.json());

@@ -7,3 +7,5 @@ ReactDOM.render(
     <App />,
     document.getElementById('container')
 );
+
+// TODO: invalidate session if necessary

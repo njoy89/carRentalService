@@ -229,7 +229,7 @@ export const Cars: React.FunctionComponent<{}> = () => {
                 handleRentalModalClose();
             });
     };
-    const handleReturn = (comment: string) => {
+    const handleReturn = (comments: string) => {
         if (modalCar === null) {
             return;
         }
@@ -240,9 +240,9 @@ export const Cars: React.FunctionComponent<{}> = () => {
             return;
         }
 
-        CarService.returnCar(myRental.id, comment)
+        CarService.returnCar(myRental.id, comments)
             .then((response) => {
-                if (response !== 'OK') {
+                if (typeof response === 'string') {
                     setErrorMessage('You cannot return this car');
                 } else {
                     setSuccessMessage('You returned a car!');

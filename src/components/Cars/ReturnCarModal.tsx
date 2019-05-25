@@ -13,7 +13,7 @@ import TextField from '@material-ui/core/TextField';
 interface RentalCarModalProps {
     show: boolean;
     handleClose: () => void;
-    handleOk: (comment: string) => void;
+    handleOk: (comments: string) => void;
     car: Car;
 }
 
@@ -23,10 +23,10 @@ export const ReturnCarModal: React.FunctionComponent<RentalCarModalProps> = ({
     handleOk,
     car
 }) => {
-    const [comment, setComment] = useState('');
+    const [comments, setComments] = useState('');
 
     const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setComment(e.currentTarget.value);
+        setComments(e.currentTarget.value);
     };
 
     return (
@@ -49,10 +49,10 @@ export const ReturnCarModal: React.FunctionComponent<RentalCarModalProps> = ({
             <DialogActions>
                 <Button onClick={handleClose} color="primary">Cancel</Button>
                 <Button
-                    onClick={() => handleOk(comment)}
+                    onClick={() => handleOk(comments)}
                     color="primary"
                     variant="outlined"
-                    disabled={comment.trim() === ''}
+                    disabled={comments.trim() === ''}
                 >Return</Button>
             </DialogActions>
         </Dialog>

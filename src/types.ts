@@ -28,7 +28,12 @@ export interface Client {
     address: string;
 }
 
-// TODO
+export enum RentalStatus {
+    RENTED = 'RENTED',
+    RETURNED_BUT_CHARGE_NOT_SETTLED = 'RETURNED_BUT_CHARGE_NOT_SETTLED',
+    RETURNED_AND_CHARGED_SETTLED = 'RETURNED_AND_CHARGED_SETTLED'
+}
+
 export interface MyRental {
     id: string;
     carId: string;
@@ -37,7 +42,8 @@ export interface MyRental {
     rentDate: string;
     returnDate: string | null;
     amount: number;
-    comment: string;
+    comments: string;
+    status: RentalStatus;
 }
 
 export interface MyRentalsData {

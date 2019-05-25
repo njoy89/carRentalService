@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import CarService from '../services/carService';
+import ClientService from '../services/clientService';
 import { MyRental, MyRentalsData } from '../types';
 
 export interface GetMyRentalsData extends MyRentalsData {
@@ -14,13 +15,19 @@ export function getMyRentals(): GetMyRentalsData {
     });
 
     const loadData = () => {
+        const clientId = ClientService.getId();
+
+        if (clientId === null) {
+            return;
+        }
+
         setData({
             data: [],
             isFetching: true,
             error: ''
         });
 
-        CarService.getMyRentals()
+        CarService.getMyRentals(clientId)
             .then((myRentals: MyRental[]) => {
                 setData({
                     data: myRentals,
