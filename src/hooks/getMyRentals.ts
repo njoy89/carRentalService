@@ -1,36 +1,36 @@
 import { useState, useEffect } from 'react';
 import CarService from '../services/carService';
-import { Car, CarsData } from '../types';
+import { MyRental, MyRentalsData } from '../types';
 
-export interface GetCarsData extends CarsData {
+export interface GetMyRentalsData extends MyRentalsData {
     loadData: () => void;
 }
 
-export function getCars(): GetCarsData {
-    const [data, setData] = useState<CarsData>({
-        cars: [],
+export function getMyRentals(): GetMyRentalsData {
+    const [data, setData] = useState<MyRentalsData>({
+        data: [],
         isFetching: false,
         error: ''
     });
 
     const loadData = () => {
         setData({
-            cars: [],
+            data: [],
             isFetching: true,
             error: ''
         });
 
-        CarService.loadCars()
-            .then((cars: Car[]) => {
+        CarService.getMyRentals()
+            .then((myRentals: MyRental[]) => {
                 setData({
-                    cars,
+                    data: myRentals,
                     isFetching: false,
                     error: ''
                 });
             })
             .catch(() => {
                 setData({
-                    cars: [],
+                    data: [],
                     isFetching: false,
                     error: 'Error while fetching error'
                 });

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { getCars } from '../../hooks/getCars';
+import { getMyRentals } from '../../hooks/getMyRentals';
 import { Car, CarStatus } from '../../types';
 import { RentalCarModal } from './RentalCarModal';
 import { ReturnCarModal } from './ReturnCarModal';
@@ -54,14 +55,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface CarCardProps {
     car: Car;
-    rentCar: (car: Car) => void;
-    returnCar: (car: Car) => void;
+    isRentedByCurrentUser: boolean;
+    handleRentCarClick: (car: Car) => void;
+    handleReturnCarClick: (car: Car) => void;
 }
 
 const CarCard: React.FunctionComponent<CarCardProps> = ({
     car,
-    rentCar,
-    returnCar
+    handleRentCarClick,
+    handleReturnCarClick,
+    isRentedByCurrentUser
 }) => {
     const classes = useStyles();
     const clientIsAuthenticated = ClientService.isAuthenticated();
@@ -100,41 +103,43 @@ const CarCard: React.FunctionComponent<CarCardProps> = ({
     };
 
     const getActionButton = () => {
-        // TODO: determine which button is supposed to be shown
+        const carStatus = car.carStatus;
+        const carIsRentedBySomeoneElse = carStatus === CarStatus.RENTED && !isRentedByCurrentUser;
 
-        switch (car.carStatus) {
-            case CarStatus.AVAILABLE:
-                return (
-                    <Button
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        className={classes.actionButton}
-                        onClick={() => rentCar(car)}
-                    >Rent</Button>
-                );
-            case CarStatus.RENTED:
-                return (
-                    <Button
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        className={classes.actionButton}
-                        onClick={() => returnCar(car)}
-                    >Return</Button>
-                );
-            case CarStatus.UNAVAILABLE:
-                return (
-                    <Button
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        className={classes.actionButton}
-                        disabled
-                    >Rent</Button>
-                );
-            default:
-                return null;
+        if (carStatus === CarStatus.AVAILABLE || carIsRentedBySomeoneElse) {
+            const disabled = carStatus === CarStatus.RENTED && !isRentedByCurrentUser;
+            return (
+                <Button
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    className={classes.actionButton}
+                    onClick={() => handleRentCarClick(car)}
+                    disabled={carIsRentedBySomeoneElse}
+                >Rent</Button>
+            );
+        } else if (carStatus === CarStatus.RENTED) {
+            return (
+                <Button
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    className={classes.actionButton}
+                    onClick={() => handleReturnCarClick(car)}
+                >Return</Button>
+            );
+        } else if (carStatus === CarStatus.UNAVAILABLE) {
+            return (
+                <Button
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    className={classes.actionButton}
+                    disabled
+                >Rent</Button>
+            );
+        } else {
+            return null;
         }
     };
 
@@ -181,11 +186,19 @@ export const Cars: React.FunctionComponent<{}> = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const rentCar = (car: Car) => {
+    const getCarsData = getCars();
+    const getMyRentalsData = getMyRentals();
+    const classes = useStyles();
+    const updateData = () => {
+        getCarsData.loadData();
+        getMyRentalsData.loadData();
+    };
+
+    const handleRentCarClick = (car: Car) => {
         setModalCar(car);
         setRentalModalIsShown(true);
     };
-    const returnCar = (car: Car) => {
+    const handleReturnCarClick = (car: Car) => {
         setModalCar(car);
         setReturnModalIsShow(true);
     };
@@ -210,7 +223,7 @@ export const Cars: React.FunctionComponent<{}> = () => {
                     setErrorMessage('You cannot rent this car');
                 } else {
                     setSuccessMessage('You rented a car!');
-                    getCarsData.loadCars();
+                    updateData();
                 }
 
                 handleRentalModalClose();
@@ -221,38 +234,43 @@ export const Cars: React.FunctionComponent<{}> = () => {
             return;
         }
 
-        const carId = modalCar.id;
+        const myRental = CarService.getMyRentalByCarId(getMyRentalsData.data, modalCar.id);
 
-        CarService.returnCar(carId, comment)
+        if (!myRental) {
+            return;
+        }
+
+        CarService.returnCar(myRental.id, comment)
             .then((response) => {
                 if (response !== 'OK') {
                     setErrorMessage('You cannot return this car');
                 } else {
                     setSuccessMessage('You returned a car!');
-                    getCarsData.loadCars();
+                    updateData();
                 }
 
                 handleReturnModalClose();
             });
     };
 
-    const getCarsData = getCars();
-    const classes = useStyles();
+    if (getCarsData.isFetching || getMyRentalsData.isFetching) {
+        return (
+            <div className={classes.spinnerWrapper}>
+                <CircularProgress size={60} />
+            </div>
+        );
+    }
 
     return (
         <>
-            { getCarsData.isFetching && (
-                <div className={classes.spinnerWrapper}>
-                    <CircularProgress size={60} />
-                </div>
-            ) }
             <Grid container spacing={3}>{
                 getCarsData.cars.map((car) => (
                     <CarCard
                         key={car.id}
                         car={car}
-                        rentCar={rentCar}
-                        returnCar={returnCar}
+                        handleRentCarClick={handleRentCarClick}
+                        handleReturnCarClick={handleReturnCarClick}
+                        isRentedByCurrentUser={CarService.isCarRentedByCurrentUser(getMyRentalsData.data, car.id)}
                     />
                 ))
             }</Grid>

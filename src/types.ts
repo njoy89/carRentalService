@@ -27,3 +27,21 @@ export interface Client {
     email: string;
     address: string;
 }
+
+// TODO
+export interface MyRental {
+    id: string;
+    carId: string;
+    startDate: string;
+    endDate: string;
+    rentDate: string;
+    returnDate: string | null;
+    amount: number;
+    comment: string;
+}
+
+export interface MyRentalsData {
+    data: MyRental[];
+    isFetching: boolean;
+    error: string;
+}
