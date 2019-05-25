@@ -59,6 +59,24 @@ const returnCar = (carRentalId: string, comments: string): Promise<string> => {
         .then(response => response.json());
 };
 
+const settleSubcharge = (carRentalId: string): Promise<string> => {
+    const clientId = ClientService.getId();
+
+    return fetch(`${HOST}/api/settleSubcharge`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            clientId,
+            carRentalId
+        })
+    })
+        .then(response => response.json());
+};
+
+
 const isCarRentedByCurrentUser = (myRentals: MyRental[], carId: string): boolean =>
     myRentals
         .filter(item => item.status === RentalStatus.RENTED) // not yet returned
@@ -75,6 +93,7 @@ export default {
     loadCars,
     rentCar,
     returnCar,
+    settleSubcharge,
     getMyRentals,
     isCarRentedByCurrentUser,
     getMyRentalByCarId

@@ -31,7 +31,7 @@ export interface Client {
 export enum RentalStatus {
     RENTED = 'RENTED',
     RETURNED_BUT_CHARGE_NOT_SETTLED = 'RETURNED_BUT_CHARGE_NOT_SETTLED',
-    RETURNED_AND_CHARGED_SETTLED = 'RETURNED_AND_CHARGED_SETTLED'
+    RETURNED_AND_CHARGE_SETTLED = 'RETURNED_AND_CHARGE_SETTLED'
 }
 
 export interface MyRental {
@@ -42,6 +42,7 @@ export interface MyRental {
     rentDate: string;
     returnDate: string | null;
     amount: number;
+    subcharge: number;
     comments: string;
     status: RentalStatus;
 }
